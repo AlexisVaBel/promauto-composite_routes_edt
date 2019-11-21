@@ -11,7 +11,6 @@ SOURCES += \
     controller/routesall.cpp \
     controller/subrouteconf.cpp \
     controller/uitodbtable.cpp \
-    dataimpl/excholder.cpp \
     dataimpl/ibppdataprovider.cpp \
     main.cpp \
     ibpp/core/all_in_one.cpp \
@@ -39,16 +38,11 @@ HEADERS += \
     controller/subrouteconf.h \
     controller/uitodbtable.h \
     dataiface/idataprovider.h \
-    dataiface/iexhandler.h \
-    dataimpl/excholder.h \
-    dataimpl/exhandlermainavl.h \
     dataimpl/ibppdataprovider.h \
     domain/columnnode.h \
-    domain/devices.h \
     domain/roots.h \
     domain/sqlholder.h \
     mainwindow.h \
     visual/buttonpanel.h \
-    visual/routesui.h \
-    instead_c14.h
+    visual/routesui.h
 
