@@ -2,19 +2,20 @@
 
 // suffix means screen to wich sql/dml belongs to
 
-static const char * SELECT_SUBROUTE_DEVS_RTS  = " select d.name  from rootdevices rd, devices d where (rd.root_id = %1) and (rd.device_id = d.id) ";
+
 
 static const char * SELECT_SUBROUTES_RTS      = " select id, name, descr, code, rootbegin, rootend subroot from roots where subroot = 1";
 static const char * SELECT_ROUTE_SUBS_RTS     = " select sr.id, sr.root_id, sr.subroot_id, r.name, r.rootbegin, r.rootend from subroots sr, roots r where (r.id=sr.subroot_id) and (sr.root_id=%id%)";
 
 static const char * SELECT_ROUTE_DEVS_RTS     = "select d.id, d.name, rd.timestart, rd.timestop, rd.ordernum, rd.fl_armo, rd.fl_transparent, rd.fl_ctrlprod, rd.fl_prod, rd.dly_prodstop, rd.fl_ctrlonly, rd.fl_soleowner, rd.device_id from rootdevices rd, devices d where (rd.root_id = %1)  and (rd.device_id=d.id) order by ordernum";
                                                                                                                                                                                                                   //select d.name  from rootdevices rd, devices d where (rd.root_id = %1) and (rd.device_id = d.id)
+static const char * SELECT_ALL_DEVS_MCHB      = "select id, name from devices where devtype = 'MCHB'  order by name";
 
 // dml
-static const char * INSERT_SUB_TO_ROUTE       = "INSERT INTO SUBROOTS(ROOT_ID, SUBROOT_ID)  VALUES(%1, %2)";
+static const char * INSERT_SUB_TO_ROUTE                = "INSERT INTO SUBROOTS(ROOT_ID, SUBROOT_ID)  VALUES(%1, %2)";
 
 static const char * DELETE_SUB_FROM_ROUTE              = "DELETE FROM SUBROOTS where id = %1";
-static const char * DELETE_SUB_DEVICES_FROM_ROUTE     = "DELETE FROM ROOTDEVICES where root_id = %1 and device_id = %2";
+static const char * DELETE_SUB_DEVICES_FROM_ROUTE      = "DELETE FROM ROOTDEVICES where root_id = %1 and device_id = %2";
 
 /*
 
@@ -180,6 +181,29 @@ VALUES(
     :FL_SOLEOWNER,
     :DLY_PRODSTOP
 )
+
+
+  if DataSet.FieldByName('FL_CTRLONLY').AsInteger>0 then s := s + 'Ê';
+
+  if DataSet.FieldByName('FL_ARMO').AsInteger>0 then s := s + 'Í';
+
+  if DataSet.FieldByName('FL_TRANSPARENT').AsInteger=1 then s := s + 'ÏðÇ ';
+  if DataSet.FieldByName('FL_TRANSPARENT').AsInteger=2 then s := s + 'ÏðÐ ';
+  if DataSet.FieldByName('FL_TRANSPARENT').AsInteger=3 then s := s + 'Ïð ';
+
+  if DataSet.FieldByName('FL_CTRLPROD').AsInteger>0 then s := s + 'Êï';
+
+  if DataSet.FieldByName('FL_PROD').AsInteger>0 then s := s + 'Ïä';
+
+  if (DataSet.FieldByName('FL_PROD').AsInteger>0) and
+        (DataSet.FieldByName('DLY_PRODSTOP').AsInteger>0)
+  then
+    s := s + DataSet.FieldByName('DLY_PRODSTOP').AsString;
+
+  if DataSet.FieldByName('FL_SOLEOWNER').AsInteger>0 then s := s + 'È';
+
+  DataSet.FieldByName('MODEFLAGS').AsString := s;
+
 
 */
 

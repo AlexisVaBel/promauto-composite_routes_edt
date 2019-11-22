@@ -47,9 +47,9 @@ void RouteConf::route_subs_cellDblClicked()
     if(lstSelected.length() != 1)return;
 
     // take id for delete
-    int id         = m_lstSubsInRt->at(lstSelected.at(0).row())->id;
-    int subroot_id =m_lstSubsInRt->at(lstSelected.at(0).row())->subroot_id;
-    int root_id    =m_lstSubsInRt->at(lstSelected.at(0).row())->root_id;
+    uint id         = m_lstSubsInRt->at(lstSelected.at(0).row())->id;
+    uint subroot_id = m_lstSubsInRt->at(lstSelected.at(0).row())->subroot_id;
+    uint root_id    = m_lstSubsInRt->at(lstSelected.at(0).row())->root_id;
     del_subroute(id,root_id,subroot_id);
 }
 
@@ -78,8 +78,7 @@ void RouteConf::add_subroute(int &idx)
             strDML2 = strDML + strDML2;            
 
             if(! m_provider->proces_sql(strDML2.toStdString(), true, nullptr)){
-                std::cout << "none insert made" << std::endl;
-                std::cout << strDML2.toStdString() << std::endl;
+                std::cerr << "subs devices were not inserted" << std::endl;
             }
         }
         // эти моменты под вопросом
@@ -90,26 +89,24 @@ void RouteConf::add_subroute(int &idx)
     }
 }
 
-void RouteConf::del_subroute(int &idx, int &root_id, int &subroot_id)
+void RouteConf::del_subroute(uint &idx, uint &root_id, uint &subroot_id)
 {
     QString strDML = DELETE_SUB_FROM_ROUTE ;
-    strDML = strDML.arg(idx);
+    strDML = strDML.arg(idx); // contains subroots.id
 
     if(m_provider->proces_sql(strDML.toStdString(), true, nullptr)){
         std::shared_ptr<QList<StructRoots*>>    lst_devsInSub = std::make_shared<QList<StructRoots *>>();
-        QString strSQL = SELECT_ROUTE_DEVS_RTS;
-        strSQL = strSQL.arg(root_id);
-        if(commonSelectProcedure(lst_devsInSub,strSQL,root_id)){
+        QString strSQL = SELECT_ROUTE_DEVS_RTS; // all devs connected with subroot
+        strSQL = strSQL.arg(subroot_id);
+        if(commonSelectProcedure(lst_devsInSub,strSQL,subroot_id)){
             for(int i = 0; i < lst_devsInSub->length(); ++i){
                 strDML = DELETE_SUB_DEVICES_FROM_ROUTE;
                 strDML = strDML.arg(root_id);// root_id
                 strDML = strDML.arg(lst_devsInSub->at(i)->device_id);// device_id
 
-                if(m_provider->proces_sql(strDML.toStdString(), true, nullptr)){
-                    continue;
-                }else{
-                    std::cout << __PRETTY_FUNCTION__ << " " << "Fatal error "<< std::endl;
-                }
+                if(!m_provider->proces_sql(strDML.toStdString(), true, nullptr)){
+                    std::cerr << "device wasn`t deleted "<<  lst_devsInSub->at(i)->name.toStdString() << std::endl;
+                };
             }
         };
 
@@ -335,7 +332,9 @@ bool RouteConf::can_add_sub_toRoute()
 {
     for(int isubs = 0; isubs < m_lstDevsInSub->length(); ++isubs){
         for(int idevs = 0; idevs < m_lstDevsInRt->length(); ++idevs){
-            if(m_lstDevsInSub->at(isubs)->name.compare(m_lstDevsInRt->at(idevs)->name,Qt::CaseInsensitive)) return false; // use id, instead name - need to remake sql
+            if(m_lstDevsInSub->at(isubs)->name.compare(m_lstDevsInRt->at(idevs)->name,Qt::CaseInsensitive) == 0) {
+                return false; // use id, instead name - need to remake sql
+            }
         };
     };
     return true;
@@ -353,6 +352,7 @@ void RouteConf::selectRoutes()
         }
     }
     m_completer     = new QCompleter(lstCompleter, this); // completer test
+    m_completer->setCaseSensitivity(Qt::CaseInsensitive);
     m_ui->m_edtRouteName->setCompleter(m_completer);
 }
 

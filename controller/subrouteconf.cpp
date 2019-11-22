@@ -3,25 +3,51 @@
 #include "../domain/sqlholder.h"
 
 #include <QCheckBox>
+#include <QComboBox>
+#include <QCompleter>
 #include <QTextCodec>
 
 
-SubRouteConf::SubRouteConf(RoutesUI *ui, std::shared_ptr<IDataProvider> provider):UIToDBTable (ui,provider)
+SubRouteConf::SubRouteConf(RoutesUI *ui, std::shared_ptr<IDataProvider> provider):UIToDBTable (ui,provider),m_completer(new QCompleter())
 {
     configure_UI();
     configure_SIGSLOTS();
-
+    m_lstCompleter  = std::make_shared<QStringList>();
     m_lstAllSubs    = std::make_shared<QList<StructRoots *>>();
     m_lstDevsInSub  = std::make_shared<QList<StructRoots *>>();
     m_lstAllDevs    = std::make_shared<QList<StructRoots *>>();
 }
 
+void SubRouteConf::subs_cellClicked(int irow, int icol)
+{
+    if(irow >= m_lstAllSubs->length()) return;
+    uint idRoute = m_lstAllSubs->at(irow)->id;
+    sel_devs_inSub(idRoute);
+}
+
 void SubRouteConf::tab_idx_changed(int idx)
 {
     if(idx == 1){
-        selectAllSubs();
-        selectAllDevs();
+        sel_allSubs();
+        sel_allDevs();
     }
+}
+
+void SubRouteConf::add_device()
+{
+    //
+    int irow = m_ui->tbl_SubRtsConf_DevsInSub->rowCount();
+    m_ui->tbl_SubRtsConf_DevsInSub->insertRow(irow);
+
+
+    QComboBox *cmb = new QComboBox();
+    cmb->setCompleter(m_completer);
+
+
+
+    cmb->addItems(*(m_lstCompleter.get()));
+    m_ui->tbl_SubRtsConf_DevsInSub->setCellWidget(irow, 1, std::move(cmb));
+
 }
 
 void SubRouteConf::configure_UI()
@@ -49,37 +75,66 @@ void SubRouteConf::configure_UI()
 void SubRouteConf::configure_SIGSLOTS()
 {
     connect(m_ui->m_tabWidget,    &QTabWidget::currentChanged, this, &SubRouteConf::tab_idx_changed);
+
+    connect(m_ui->tbl_SubRtsConf_SubsAll,    &QTableWidget::cellClicked, this, &SubRouteConf::subs_cellClicked );
+    connect(m_ui->m_pnlBtns_SubRtsConf_DevsInSub->btnAdd,  &QPushButton::pressed     , this, &SubRouteConf::add_device);
 }
 
 bool SubRouteConf::procsSelect()
 {
+    return false;
 }
 
 bool SubRouteConf::procsInsert()
 {
+    return false;
 }
 
 bool SubRouteConf::procsUpdate()
 {
+    return false;
 }
 
 bool SubRouteConf::procsDelete()
 {
+    return false;
 }
 
-void SubRouteConf::selectAllSubs()
+
+void SubRouteConf::sel_devs_inSub(uint id)
 {
-    if(commonSelectProcedure(m_lstAllSubs,SELECT_SUBROUTES_RTS)){
-        updateSubRoutesView();
+    QString strSQL(SELECT_ROUTE_DEVS_RTS);
+    strSQL = strSQL.arg(id);
+
+
+    if(commonSelectProcedure(m_lstDevsInSub,strSQL)){
+        upd_devsInSub_view();
     }
 }
 
-void SubRouteConf::selectAllDevs()
+void SubRouteConf::sel_allSubs()
 {
-
+    if(commonSelectProcedure(m_lstAllSubs,SELECT_SUBROUTES_RTS)){
+        upd_subRts_view();
+    }
 }
 
-void SubRouteConf::updateSubRoutesView()
+void SubRouteConf::sel_allDevs()
+{
+    if(!commonSelectProcedure(m_lstAllDevs,SELECT_ALL_DEVS_MCHB)){ // select all devs
+        std::cerr << "Impossible to get device list" << std::endl;
+        return;
+    }
+    m_lstCompleter->clear();
+    for(int i = 0; i < m_lstAllDevs->length(); ++i){
+        m_lstCompleter->append(m_lstAllDevs->at(i)->name);
+    }
+    QCompleter *cmp = m_completer;
+    delete cmp;
+    m_completer = new QCompleter(*(m_lstCompleter.get()));
+}
+
+void SubRouteConf::upd_subRts_view()
 {
     m_ui->tbl_SubRtsConf_SubsAll->blockSignals(true);
     try {
@@ -103,6 +158,24 @@ void SubRouteConf::updateSubRoutesView()
         std::cerr << exc.what() << std::endl;
     }
     m_ui->tbl_SubRtsConf_SubsAll->blockSignals(false);
+}
+
+void SubRouteConf::upd_devsInSub_view()
+{
+    m_ui->tbl_SubRtsConf_DevsInSub->blockSignals(true);
+    try {
+        while(m_ui->tbl_SubRtsConf_DevsInSub->rowCount() > 0){
+            m_ui->tbl_SubRtsConf_DevsInSub->removeRow(0);
+        }
+        for(int i = 0; i < m_lstDevsInSub->length(); ++i){
+            m_ui->tbl_SubRtsConf_DevsInSub->insertRow(i);
+            m_ui->tbl_SubRtsConf_DevsInSub->setItem(i, 0, new QTableWidgetItem(m_lstDevsInSub->at(i)->id));
+            m_ui->tbl_SubRtsConf_DevsInSub->setItem(i, 1, new QTableWidgetItem(m_lstDevsInSub->at(i)->name));
+        }
+    } catch (std::exception &exc) {
+        std::cerr << exc.what() << std::endl;
+    }
+    m_ui->tbl_SubRtsConf_DevsInSub->blockSignals(false);
 }
 
 

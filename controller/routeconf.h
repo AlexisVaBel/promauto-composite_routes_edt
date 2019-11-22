@@ -21,7 +21,7 @@ public slots:
     void        route_subs_cellDblClicked();
 
     void        add_subroute(int &idx);
-    void        del_subroute(int &idx, int &root_id, int &subroot_id);
+    void        del_subroute(uint &idx, uint &root_id, uint &subroot_id);
 
     void        tab_idx_changed(int idx);
 public:

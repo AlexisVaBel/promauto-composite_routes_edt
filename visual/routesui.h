@@ -28,9 +28,9 @@ public:
     QWidget     *m_centralwidget;
     QTabWidget  *m_tabWidget;
 
-    QLabel *m_tabMnRts;
-    QLabel *m_tabGrpEdt;
-    QLabel *m_tabRtsEdt;
+    QLabel *m_tabRtsAll;
+    QLabel *m_tabSubRtsConf;
+    QLabel *m_tabRtsConf;
 
     QTableWidget  *tbl_RtsAll_AvlRts;
     QTableWidget  *tbl_RtsAll_SubsInRt;
@@ -50,20 +50,20 @@ public:
 
     QStatusBar *statusbar;
 
-    QLabel *lblCntrMnRts;
-    QLabel *lblCntrMnDevs;
-    ButtonPanel *m_pnlBtnsMnRts;
-    ButtonPanel *m_pnlBtnsMnDevs;
+    QLabel *lblCntrRtsAll;
+    QLabel *lblCntrRtsAllDevs;
+    ButtonPanel *m_pnlBtnsRtsAll;
+    ButtonPanel *m_pnlBtnsRtsAllDevs;
 
-    QLabel *lblGrpEdtSubs;
-    QLabel *lblGrpEdtDevsInSub;
-    ButtonPanel *m_pnlBtnsEdtSubs;
-    ButtonPanel *m_pnlBtnsDevsInSub;
+    QLabel *lblSubsRtsConf;
+    QLabel *lblGrpSubRtsConf_DevsInSub;
+    ButtonPanel *m_pnlBtns_SubRtsConf;
+    ButtonPanel *m_pnlBtns_SubRtsConf_DevsInSub;
 
 
-    QGridLayout *gridLt_MnRts;
-    QGridLayout *gridLt_GrpEdt;
-    QGridLayout *gridLt_RtsEdt;
+    QGridLayout *gridLt_RtsAll;
+    QGridLayout *gridLt_SubRtsConf;
+    QGridLayout *gridLt_RtsConf;
 };
 
 #endif // ROUTESUI_H

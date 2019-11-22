@@ -15,31 +15,31 @@ RoutesUI::RoutesUI(QMainWindow *MainWindow)
     m_tabWidget->setObjectName(QStringLiteral("tabWidget"));
 
 
-    gridLt_MnRts  = new QGridLayout();
-    gridLt_GrpEdt = new QGridLayout();
-    gridLt_RtsEdt = new QGridLayout();
+    gridLt_RtsAll     = new QGridLayout();
+    gridLt_SubRtsConf = new QGridLayout();
+    gridLt_RtsConf    = new QGridLayout();
 
-    m_tabMnRts   = new QLabel();
-    m_tabGrpEdt  = new QLabel();
-    m_tabRtsEdt  = new QLabel();
-
-
-    lblCntrMnRts   = new QLabel();
-    lblCntrMnDevs  = new QLabel();
-
-    m_pnlBtnsMnRts  = new ButtonPanel(lblCntrMnRts);
-    m_pnlBtnsMnDevs = new ButtonPanel(lblCntrMnDevs);
+    m_tabRtsAll         = new QLabel();
+    m_tabSubRtsConf     = new QLabel();
+    m_tabRtsConf        = new QLabel();
 
 
-    lblGrpEdtSubs   = new QLabel();
-    lblGrpEdtDevsInSub  = new QLabel();
+    lblCntrRtsAll       = new QLabel();
+    lblCntrRtsAllDevs   = new QLabel();
 
-    m_pnlBtnsEdtSubs  = new ButtonPanel(lblGrpEdtSubs);
-    m_pnlBtnsDevsInSub = new ButtonPanel(lblGrpEdtDevsInSub);
+    m_pnlBtnsRtsAll     = new ButtonPanel(lblCntrRtsAll);
+    m_pnlBtnsRtsAllDevs = new ButtonPanel(lblCntrRtsAllDevs);
 
-    m_tabMnRts->setLayout(gridLt_MnRts);
-    m_tabGrpEdt->setLayout(gridLt_GrpEdt);
-    m_tabRtsEdt->setLayout(gridLt_RtsEdt);
+
+    lblSubsRtsConf              = new QLabel();
+    lblGrpSubRtsConf_DevsInSub  = new QLabel();
+
+    m_pnlBtns_SubRtsConf                    = new ButtonPanel(lblSubsRtsConf);
+    m_pnlBtns_SubRtsConf_DevsInSub          = new ButtonPanel(lblGrpSubRtsConf_DevsInSub);
+
+    m_tabRtsAll->setLayout(gridLt_RtsAll);
+    m_tabSubRtsConf->setLayout(gridLt_SubRtsConf);
+    m_tabRtsConf->setLayout(gridLt_RtsConf);
 
     tbl_RtsAll_AvlRts    = new QTableWidget();
     tbl_RtsAll_SubsInRt  = new QTableWidget();
@@ -59,37 +59,37 @@ RoutesUI::RoutesUI(QMainWindow *MainWindow)
 
 
 
-    gridLt_MnRts->addWidget(lblCntrMnRts, 0, 0);
-    gridLt_MnRts->addItem(new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding), 0, 1, 1, 1);
-    gridLt_MnRts->addWidget(lblCntrMnDevs, 0, 1);
-    gridLt_MnRts->addWidget(tbl_RtsAll_AvlRts, 1, 0);
-    gridLt_MnRts->addWidget(tbl_RtsAll_SubsInRt, 2, 0);
-    gridLt_MnRts->addWidget(tbl_RtsAll_AllDevs, 1, 1);
+    gridLt_RtsAll->addWidget(lblCntrRtsAll, 0, 0);
+    gridLt_RtsAll->addItem(new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding), 0, 1, 1, 1);
+    gridLt_RtsAll->addWidget(lblCntrRtsAllDevs, 0, 1);
+    gridLt_RtsAll->addWidget(tbl_RtsAll_AvlRts, 1, 0);
+    gridLt_RtsAll->addWidget(tbl_RtsAll_SubsInRt, 2, 0);
+    gridLt_RtsAll->addWidget(tbl_RtsAll_AllDevs, 1, 1);
 
-    gridLt_MnRts->setColumnStretch(0,10);
-    gridLt_MnRts->setColumnStretch(1,20);
-    gridLt_MnRts->setRowStretch(0,0);
-    gridLt_MnRts->setRowStretch(1,3);
-    gridLt_MnRts->setRowStretch(2,2);
-
-
-
-    gridLt_GrpEdt->addWidget(lblGrpEdtSubs, 0, 0);
-    gridLt_GrpEdt->addItem(new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding), 0, 1, 1, 1);
-    gridLt_GrpEdt->addWidget(lblGrpEdtDevsInSub, 0, 1);
-    gridLt_GrpEdt->addWidget(tbl_SubRtsConf_SubsAll, 1, 0);
-    gridLt_GrpEdt->addWidget(tbl_SubRtsConf_DevsInSub, 1, 1);
-    gridLt_GrpEdt->setRowStretch(0,0);
-    gridLt_GrpEdt->setRowStretch(1,3);
+    gridLt_RtsAll->setColumnStretch(0,10);
+    gridLt_RtsAll->setColumnStretch(1,20);
+    gridLt_RtsAll->setRowStretch(0,0);
+    gridLt_RtsAll->setRowStretch(1,3);
+    gridLt_RtsAll->setRowStretch(2,2);
 
 
 
+    gridLt_SubRtsConf->addWidget(lblSubsRtsConf, 0, 0);
+    gridLt_SubRtsConf->addItem(new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding), 0, 1, 1, 1);
+    gridLt_SubRtsConf->addWidget(lblGrpSubRtsConf_DevsInSub, 0, 1);
+    gridLt_SubRtsConf->addWidget(tbl_SubRtsConf_SubsAll, 1, 0);
+    gridLt_SubRtsConf->addWidget(tbl_SubRtsConf_DevsInSub, 1, 1);
+    gridLt_SubRtsConf->setRowStretch(0,0);
+    gridLt_SubRtsConf->setRowStretch(1,3);
 
-    gridLt_RtsEdt->addWidget(m_edtRouteName, 0, 0, 1, 2, Qt::AlignLeft);
-    gridLt_RtsEdt->addWidget(tbl_RtsConf_SubsAll, 1, 0);
-    gridLt_RtsEdt->addWidget(tbl_RtsConf_DevsInSub, 2, 0);
-    gridLt_RtsEdt->addWidget(tbl_RtsConf_SubsInRt, 1, 1);
-    gridLt_RtsEdt->addWidget(tbl_RtsConf_DevsInRt, 2, 1);
+
+
+
+    gridLt_RtsConf->addWidget(m_edtRouteName, 0, 0, 1, 2, Qt::AlignLeft);
+    gridLt_RtsConf->addWidget(tbl_RtsConf_SubsAll, 1, 0);
+    gridLt_RtsConf->addWidget(tbl_RtsConf_DevsInSub, 2, 0);
+    gridLt_RtsConf->addWidget(tbl_RtsConf_SubsInRt, 1, 1);
+    gridLt_RtsConf->addWidget(tbl_RtsConf_DevsInRt, 2, 1);
 
 
     statusbar = new QStatusBar(MainWindow);
@@ -98,9 +98,9 @@ RoutesUI::RoutesUI(QMainWindow *MainWindow)
     MainWindow->setCentralWidget(m_centralwidget);
     MainWindow->setStatusBar(statusbar);
 
-    m_tabWidget->addTab(m_tabMnRts,  QString("first"));
-    m_tabWidget->addTab(m_tabGrpEdt, QString("second"));
-    m_tabWidget->addTab(m_tabRtsEdt, QString("third"));
+    m_tabWidget->addTab(m_tabRtsAll,  QString("first"));
+    m_tabWidget->addTab(m_tabSubRtsConf, QString("second"));
+    m_tabWidget->addTab(m_tabRtsConf, QString("third"));
 
 
 }

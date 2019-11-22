@@ -207,7 +207,7 @@ void RoutesAll::add_route()
 
     for(int i = 0; i < m_lstAllRts->length(); ++i){
         if(m_lstAllRts->at(i)->str_name.compare(strSomeText, Qt::CaseInsensitive) == 0){
-            std::cout << "already exists " << strSomeText.toStdString() << std::endl;
+            std::cerr << "already exists " << strSomeText.toStdString() << std::endl;
             return;
         }
     }
@@ -218,6 +218,10 @@ void RoutesAll::add_route()
     if(m_provider->proces_sql(codec->fromUnicode(strDML).toStdString(), true, nullptr)){
         procsSelect();
     }
+
+    m_ui->m_edtRouteName->setText(strSomeText);
+    m_ui->m_tabWidget->setCurrentIndex(2);
+    m_ui->m_edtRouteName->editingFinished();
 }
 
 void RoutesAll::del_route()
@@ -258,6 +262,11 @@ void RoutesAll::update_route()
         procsSelect();
     }
 
+
+    m_ui->m_edtRouteName->setText(strSomeText);
+    m_ui->m_tabWidget->setCurrentIndex(2);
+    m_ui->m_edtRouteName->editingFinished();
+
 }
 
 void RoutesAll::tab_idx_changed(int idx)
@@ -297,7 +306,7 @@ void RoutesAll::configure_UI()
                                                        << codec->toUnicode("Кп") << codec->toUnicode("Пд") << codec->toUnicode("И")
                                                        << codec->toUnicode("Пр") << codec->toUnicode("ПдЗ")<< codec->toUnicode("Старт")<<codec->toUnicode("Стоп"));
 
-    m_ui->m_pnlBtnsMnRts->btnAccept->setText(codec->toUnicode("Изменить"));
+    m_ui->m_pnlBtnsRtsAll->btnAccept->setText(codec->toUnicode("Изменить"));
 
 }
 
@@ -310,12 +319,12 @@ void RoutesAll::configure_SIGSLOTS()
     connect(m_ui->tbl_RtsAll_AvlRts, &QTableWidget::currentCellChanged , this, &RoutesAll::main_cellChanged );
     connect(m_ui->tbl_RtsAll_AvlRts, &QTableWidget::doubleClicked      , this, &RoutesAll::update_route );
 
-    connect(m_ui->m_pnlBtnsMnDevs->btnAccept, &QPushButton::pressed, this, &RoutesAll::update_devs);
+    connect(m_ui->m_pnlBtnsRtsAllDevs->btnAccept, &QPushButton::pressed, this, &RoutesAll::update_devs);
 
 
-    connect(m_ui->m_pnlBtnsMnRts->btnAdd, &QPushButton::pressed, this, &RoutesAll::add_route);
-    connect(m_ui->m_pnlBtnsMnRts->btnDell, &QPushButton::pressed, this, &RoutesAll::del_route);
-    connect(m_ui->m_pnlBtnsMnRts->btnAccept, &QPushButton::pressed, this, &RoutesAll::update_route);
+    connect(m_ui->m_pnlBtnsRtsAll->btnAdd, &QPushButton::pressed, this, &RoutesAll::add_route);
+    connect(m_ui->m_pnlBtnsRtsAll->btnDell, &QPushButton::pressed, this, &RoutesAll::del_route);
+    connect(m_ui->m_pnlBtnsRtsAll->btnAccept, &QPushButton::pressed, this, &RoutesAll::update_route);
 
 }
 

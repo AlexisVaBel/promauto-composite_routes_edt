@@ -14,8 +14,11 @@ public:
 
 
 public slots:
+    void    subs_cellClicked(int irow, int icol);
     void    tab_idx_changed(int idx);
 
+
+    void    add_device();
 
 public:
     virtual void configure_UI() override;
@@ -26,15 +29,20 @@ public:
     virtual bool procsDelete() override;
 
 private:
+    QCompleter      *m_completer;
+    std::shared_ptr<QStringList> m_lstCompleter;
     std::shared_ptr<QList<StructRoots*>>    m_lstAllSubs;
     std::shared_ptr<QList<StructRoots*>>    m_lstDevsInSub;
 
     std::shared_ptr<QList<StructRoots*>>    m_lstAllDevs;
 
-    void selectAllSubs();
-    void selectAllDevs();
+    void sel_allSubs();
+    void sel_allDevs();
 
-    void updateSubRoutesView();
+    void sel_devs_inSub(uint id);
+
+    void upd_subRts_view();
+    void upd_devsInSub_view();
 
 
     bool commonSelectProcedure(std::shared_ptr<QList<StructRoots *> > dataContainer, const QString &someScript, const uint &root_id = 0);
