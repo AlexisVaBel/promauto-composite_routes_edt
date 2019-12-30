@@ -1,6 +1,7 @@
 #include "routeconf.h"
 #include "../domain/sqlholder.h"
 
+#include <QSpinBox>
 #include <QTextCodec>
 
 
@@ -134,6 +135,7 @@ void RouteConf::configure_UI()
     m_ui->tbl_RtsConf_SubsAll->setSelectionBehavior(QAbstractItemView::SelectRows);
     m_ui->tbl_RtsConf_SubsAll->hideColumn(0);
     m_ui->tbl_RtsConf_SubsAll->setHorizontalHeaderLabels(QStringList() << "Id" << codec->toUnicode("Доступные группы для вкл. в маршрут"));
+    m_ui->tbl_RtsConf_SubsAll->setColumnWidth(1, m_ui->tbl_RtsConf_SubsAll->width() / 2);
 
     m_ui->tbl_RtsConf_DevsInSub->setColumnCount(2);
     m_ui->tbl_RtsConf_DevsInSub->setShowGrid(true);
@@ -141,6 +143,7 @@ void RouteConf::configure_UI()
     m_ui->tbl_RtsConf_DevsInSub->setSelectionBehavior(QAbstractItemView::SelectRows);
     m_ui->tbl_RtsConf_DevsInSub->hideColumn(0);
     m_ui->tbl_RtsConf_DevsInSub->setHorizontalHeaderLabels(QStringList() << "Id" << codec->toUnicode("Устройства"));
+    m_ui->tbl_RtsConf_DevsInSub->setColumnWidth(1, m_ui->tbl_RtsConf_DevsInSub->width() / 2);
 
     m_ui->tbl_RtsConf_SubsInRt->setColumnCount(2);
     m_ui->tbl_RtsConf_SubsInRt->setShowGrid(true);
@@ -148,6 +151,7 @@ void RouteConf::configure_UI()
     m_ui->tbl_RtsConf_SubsInRt->setSelectionBehavior(QAbstractItemView::SelectRows);
     m_ui->tbl_RtsConf_SubsInRt->hideColumn(0);
     m_ui->tbl_RtsConf_SubsInRt->setHorizontalHeaderLabels(QStringList() << "Id" << codec->toUnicode("Группы в составе маршрута"));
+    m_ui->tbl_RtsConf_SubsInRt->setColumnWidth(1, m_ui->tbl_RtsConf_SubsInRt->width() / 2);
 
     m_ui->tbl_RtsConf_DevsInRt->setColumnCount(5);
     m_ui->tbl_RtsConf_DevsInRt->setShowGrid(true);
@@ -229,6 +233,8 @@ void RouteConf::updateSubInRouteView()
             m_ui->tbl_RtsConf_SubsInRt->setItem(i, 1, new QTableWidgetItem(m_lstSubsInRt->at(i)->name));
             m_ui->tbl_RtsConf_SubsInRt->item(i,1)->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 
+
+
         }
     } catch (std::exception &exc) {
         std::cerr << exc.what() << std::endl;
@@ -248,6 +254,8 @@ void RouteConf::updateDevsInSubView()
             m_ui->tbl_RtsConf_DevsInSub->setItem(i, 0, new QTableWidgetItem(m_lstDevsInSub->at(i)->id));
             m_ui->tbl_RtsConf_DevsInSub->setItem(i, 1, new QTableWidgetItem(m_lstDevsInSub->at(i)->name));
             m_ui->tbl_RtsConf_DevsInSub->item(i,1)->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+            //
+
 
         }
     } catch (std::exception &exc) {
@@ -260,6 +268,7 @@ void RouteConf::updateDevsView()
 { 
     m_ui->tbl_RtsConf_DevsInRt->blockSignals(true);
     try {
+        QTextCodec *codec = QTextCodec::codecForName("CP1251");
         while(m_ui->tbl_RtsConf_DevsInRt->rowCount() > 0){
             m_ui->tbl_RtsConf_DevsInRt->removeRow(0);
         }
@@ -268,6 +277,32 @@ void RouteConf::updateDevsView()
             m_ui->tbl_RtsConf_DevsInRt->setItem(i, 0, new QTableWidgetItem(m_lstDevsInRt->at(i)->id));
             m_ui->tbl_RtsConf_DevsInRt->setItem(i, 1, new QTableWidgetItem(m_lstDevsInRt->at(i)->name));
             m_ui->tbl_RtsConf_DevsInRt->item(i,1)->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+
+
+            m_ui->tbl_RtsConf_DevsInRt->setCellWidget(i, 2, new QSpinBox());
+            m_ui->tbl_RtsConf_DevsInRt->setCellWidget(i, 3, new QSpinBox());
+
+            ((QSpinBox*) m_ui->tbl_RtsConf_DevsInRt->cellWidget(i,2))->setValue(m_lstDevsInRt->at(i)->time_start);
+            ((QSpinBox*) m_ui->tbl_RtsConf_DevsInRt->cellWidget(i,3))->setValue(m_lstDevsInRt->at(i)->time_stop);
+
+            // options for
+            QString str = "|";
+            if(m_lstDevsInRt->at(i)->fl_ctronly) str.append(codec->toUnicode("K"));
+            if(m_lstDevsInRt->at(i)->fl_armo) str.append(codec->toUnicode("H"));
+            switch (m_lstDevsInRt->at(i)->fl_transparent) {
+                case 1 : str.append(codec->toUnicode("ПрЗ")); break;
+                case 2 : str.append(codec->toUnicode("ПрР")); break;
+                case 3 : str.append(codec->toUnicode("Пр")); break;
+            default: ;
+            }
+            if(m_lstDevsInRt->at(i)->fl_ctrlprod) str.append(codec->toUnicode("Кп"));
+            if(m_lstDevsInRt->at(i)->fl_prod > 0) {
+                str.append(codec->toUnicode("Пд"));
+                if(m_lstDevsInRt->at(i)->dly_prodstop > 0) str.append(m_lstDevsInRt->at(i)->dly_prodstop);
+            }
+            if(m_lstDevsInRt->at(i)->fl_soleowner) str.append(codec->toUnicode("И"));
+
+            m_ui->tbl_RtsConf_DevsInRt->setItem(i, 4, new QTableWidgetItem(str));
 
         }
     } catch (std::exception &exc) {

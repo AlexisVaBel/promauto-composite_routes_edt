@@ -2,6 +2,26 @@
 
 // suffix means screen to wich sql/dml belongs to
 
+// fl_armo - H
+// FL_CTRLPROD - Кп
+// FL_PROD - Пд
+// DLY_PRODSTOP - ПдЗ
+// FL_TRANSPARENT - Пр : 0 - , 1 - ПрЗ, 2 - ПрР , 3 - Пр
+// FL_SOLEOWNER - И
+// FL_CTRLONLY - К - Только контроль без управления
+// << ("ПдЗ")<<("Пр")<< ("И")<<("Старт")<< ("Стоп"))
+
+static const int FL_CTRONLY_COL      = 2;
+static const int FL_ARMO_COL         = 3;
+static const int FL_CTRLPROD_COL     = 4;
+static const int FL_PROD_COL         = 5;
+static const int FL_SOLEOWNER_COL    = 6;
+static const int FL_TRANSPARENT_COL  = 7;
+static const int FL_DLYPRODSTOP_COL  = 8;
+static const int FL_TIMESTART_COL    = 9;
+static const int FL_TIMESTOP_COL     = 10;
+
+
 
 
 static const char * SELECT_SUBROUTES_RTS      = " select id, name, descr, code, rootbegin, rootend subroot from roots where subroot = 1";
@@ -183,36 +203,14 @@ VALUES(
 )
 
 
-  if DataSet.FieldByName('FL_CTRLONLY').AsInteger>0 then s := s + 'К';
-
-  if DataSet.FieldByName('FL_ARMO').AsInteger>0 then s := s + 'Н';
-
-  if DataSet.FieldByName('FL_TRANSPARENT').AsInteger=1 then s := s + 'ПрЗ ';
-  if DataSet.FieldByName('FL_TRANSPARENT').AsInteger=2 then s := s + 'ПрР ';
-  if DataSet.FieldByName('FL_TRANSPARENT').AsInteger=3 then s := s + 'Пр ';
-
-  if DataSet.FieldByName('FL_CTRLPROD').AsInteger>0 then s := s + 'Кп';
-
-  if DataSet.FieldByName('FL_PROD').AsInteger>0 then s := s + 'Пд';
-
-  if (DataSet.FieldByName('FL_PROD').AsInteger>0) and
-        (DataSet.FieldByName('DLY_PRODSTOP').AsInteger>0)
-  then
-    s := s + DataSet.FieldByName('DLY_PRODSTOP').AsString;
-
-  if DataSet.FieldByName('FL_SOLEOWNER').AsInteger>0 then s := s + 'И';
-
-  DataSet.FieldByName('MODEFLAGS').AsString := s;
-
-
 */
 
 // ~dml
 
 
 
-static const char * SELECT_SUBROUTES_SUBS       = " select name, rootbegin, rootend, descr, code, id from roots where subroot = 1 ";
-static const char * SELECT_SUBROUTE_DEVS_SUBS   = " select id, root_id, device_id from rootdevices where root_id = %id% ";
+//static const char * SELECT_SUBROUTES_SUBS       = " select name, rootbegin, rootend, descr, code, id from roots where subroot = 1 ";
+//static const char * SELECT_SUBROUTE_DEVS_SUBS   = " select id, root_id, device_id from rootdevices where root_id = %id% ";
 
 
 // all routes

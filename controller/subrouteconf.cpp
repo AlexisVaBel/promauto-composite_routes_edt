@@ -5,7 +5,12 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include <QCompleter>
+#include <QSpinBox>
 #include <QTextCodec>
+
+
+static const int NUM_MAGIC_DUMMY = 0;
+
 
 
 SubRouteConf::SubRouteConf(RoutesUI *ui, std::shared_ptr<IDataProvider> provider):UIToDBTable (ui,provider),m_completer(new QCompleter())
@@ -16,6 +21,7 @@ SubRouteConf::SubRouteConf(RoutesUI *ui, std::shared_ptr<IDataProvider> provider
     m_lstAllSubs    = std::make_shared<QList<StructRoots *>>();
     m_lstDevsInSub  = std::make_shared<QList<StructRoots *>>();
     m_lstAllDevs    = std::make_shared<QList<StructRoots *>>();
+
 }
 
 void SubRouteConf::subs_cellClicked(int irow, int icol)
@@ -34,16 +40,12 @@ void SubRouteConf::tab_idx_changed(int idx)
 }
 
 void SubRouteConf::add_device()
-{
-    //
+{    
     int irow = m_ui->tbl_SubRtsConf_DevsInSub->rowCount();
     m_ui->tbl_SubRtsConf_DevsInSub->insertRow(irow);
 
-
     QComboBox *cmb = new QComboBox();
     cmb->setCompleter(m_completer);
-
-
 
     cmb->addItems(*(m_lstCompleter.get()));
     m_ui->tbl_SubRtsConf_DevsInSub->setCellWidget(irow, 1, std::move(cmb));
@@ -69,6 +71,14 @@ void SubRouteConf::configure_UI()
     m_ui->tbl_SubRtsConf_DevsInSub->setHorizontalHeaderLabels(QStringList() << "Id" << codec->toUnicode("Устройства") << codec->toUnicode("К") << codec->toUnicode("Н")
                                                        << codec->toUnicode("Кп") << codec->toUnicode("Пд") << codec->toUnicode("И")
                                                        << codec->toUnicode("Пр") << codec->toUnicode("ПдЗ")<< codec->toUnicode("Старт")<<codec->toUnicode("Стоп"));
+
+    for(int i = 2; i < 9 ; ++i){
+
+        if(i == 7)m_ui->tbl_SubRtsConf_DevsInSub->setColumnWidth(i,50);
+        else
+            m_ui->tbl_SubRtsConf_DevsInSub->setColumnWidth(i,40);
+    }
+
 
 }
 
@@ -125,6 +135,7 @@ void SubRouteConf::sel_allDevs()
         std::cerr << "Impossible to get device list" << std::endl;
         return;
     }
+
     m_lstCompleter->clear();
     for(int i = 0; i < m_lstAllDevs->length(); ++i){
         m_lstCompleter->append(m_lstAllDevs->at(i)->name);
@@ -176,6 +187,66 @@ void SubRouteConf::upd_devsInSub_view()
         std::cerr << exc.what() << std::endl;
     }
     m_ui->tbl_SubRtsConf_DevsInSub->blockSignals(false);
+    //***
+
+
+    m_ui->tbl_SubRtsConf_DevsInSub->blockSignals(true);
+    try {
+        QTextCodec *codec = QTextCodec::codecForName("CP1251");
+        while(m_ui->tbl_SubRtsConf_DevsInSub->rowCount() > 0){
+            m_ui->tbl_SubRtsConf_DevsInSub->removeRow(0);
+        }
+
+        for(int i = 0; i < m_lstDevsInSub->length(); ++i){
+            m_ui->tbl_SubRtsConf_DevsInSub->insertRow(i);
+
+            m_ui->tbl_SubRtsConf_DevsInSub->setItem(i, 0, new QTableWidgetItem(QString::number(m_lstDevsInSub->at(i)->id)));
+            m_ui->tbl_SubRtsConf_DevsInSub->setItem(i, 1, new QTableWidgetItem(m_lstDevsInSub->at(i)->name));
+
+            for(int j = FL_CTRONLY_COL; j < FL_TRANSPARENT_COL ; ++j){
+                m_ui->tbl_SubRtsConf_DevsInSub->setCellWidget(i, j, new QCheckBox());
+            }
+            QComboBox *cmb = new QComboBox();
+//            Пр : 0 - , 1 - ПрЗ, 2 - ПрР , 3 - Пр
+            cmb->addItem(codec->toUnicode("Нет"));
+            cmb->addItem(codec->toUnicode("ПрЗ"));
+            cmb->addItem(codec->toUnicode("ПрР"));
+            cmb->addItem(codec->toUnicode("Пр"));
+
+
+            cmb->setCurrentIndex(m_lstDevsInSub->at(i)->fl_transparent);
+
+            m_ui->tbl_SubRtsConf_DevsInSub->setCellWidget(i, FL_TRANSPARENT_COL, std::move(cmb));
+
+
+
+            ((QCheckBox*) m_ui->tbl_SubRtsConf_DevsInSub->cellWidget(i,FL_CTRONLY_COL))->setChecked(m_lstDevsInSub->at(i)->fl_ctronly == 1);
+            ((QCheckBox*) m_ui->tbl_SubRtsConf_DevsInSub->cellWidget(i,FL_CTRLPROD_COL))->setChecked(m_lstDevsInSub->at(i)->fl_ctrlprod == 1);
+
+            ((QCheckBox*) m_ui->tbl_SubRtsConf_DevsInSub->cellWidget(i,FL_ARMO_COL))->setChecked(m_lstDevsInSub->at(i)->fl_armo == 1);
+            ((QCheckBox*) m_ui->tbl_SubRtsConf_DevsInSub->cellWidget(i,FL_PROD_COL))->setChecked(m_lstDevsInSub->at(i)->fl_prod == 1);
+
+            ((QCheckBox*) m_ui->tbl_SubRtsConf_DevsInSub->cellWidget(i,FL_SOLEOWNER_COL))->setChecked(m_lstDevsInSub->at(i)->fl_soleowner == 1);
+
+
+
+            m_ui->tbl_SubRtsConf_DevsInSub->setCellWidget(i, FL_DLYPRODSTOP_COL, new QSpinBox());
+            m_ui->tbl_SubRtsConf_DevsInSub->setCellWidget(i, FL_TIMESTART_COL, new QSpinBox());
+            m_ui->tbl_SubRtsConf_DevsInSub->setCellWidget(i, FL_TIMESTOP_COL, new QSpinBox());
+
+
+            ((QSpinBox*) m_ui->tbl_SubRtsConf_DevsInSub->cellWidget(i,FL_DLYPRODSTOP_COL))->setValue(m_lstDevsInSub->at(i)->dly_prodstop);
+            ((QSpinBox*) m_ui->tbl_SubRtsConf_DevsInSub->cellWidget(i,FL_TIMESTART_COL))->setValue(m_lstDevsInSub->at(i)->time_start);
+            ((QSpinBox*) m_ui->tbl_SubRtsConf_DevsInSub->cellWidget(i,FL_TIMESTOP_COL))->setValue(m_lstDevsInSub->at(i)->time_stop);
+
+
+
+        }
+    } catch (std::exception &exc) {
+        std::cerr << exc.what() << std::endl;
+    }
+    m_ui->tbl_SubRtsConf_DevsInSub->blockSignals(false);
+    //***
 }
 
 
@@ -298,4 +369,86 @@ bool SubRouteConf::commonSelectProcedure(std::shared_ptr<QList<StructRoots *> > 
     }
     return true;
 
+}
+
+
+
+
+SubrouteDevsCompleter::SubrouteDevsCompleter(QObject *parent): QAbstractListModel(parent), m_cntDevs(0){
+    m_lstDevs << "echo" << "bravo" << "popizd";
+}
+
+int SubrouteDevsCompleter::rowCount(const QModelIndex &parent) const
+{
+    return parent.isValid() ? 0 : m_lstDevs.length()-1;
+}
+
+QVariant SubrouteDevsCompleter::data(const QModelIndex &index, int role) const{
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    if(!index.isValid()) return QVariant();
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
+
+    if (index.row() >= m_lstDevs.size() || index.row() < 0)
+        return QVariant();
+
+    if(role == Qt::DisplayRole){
+        return m_lstDevs.at(index.row());
+    }else
+        if( role == Qt::BackgroundRole){
+            int batch = (index.row() / 10) % 2;
+            if(batch == 0)return QBrush(Qt::white);
+            else return QBrush(Qt::gray);
+        }
+    return QVariant();
+}
+
+void SubrouteDevsCompleter::setItemSrc(const std::shared_ptr<QList<StructRoots *> > lstAllDevs)
+{
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
+
+    beginResetModel();
+//    m_lstDevs.clear();
+    m_cntDevs = 0;
+    for(int i = 0; i < lstAllDevs->length(); ++i){
+        m_lstDevs << (lstAllDevs->at(i)->name);
+    }
+    m_cntDevs = 0;
+    std::cout << m_lstDevs.length() << std::endl;
+    endResetModel();
+    QModelIndex topLeft = createIndex(0,0);
+    emit dataChanged(topLeft,topLeft);
+}
+
+void SubrouteDevsCompleter::setItemFilter(const std::shared_ptr<QList<StructRoots *> > lstExistDevs)
+{
+    beginResetModel();
+    for(int i = 0; i < lstExistDevs->length(); ++i){
+        auto idx = m_lstDevs.indexOf(lstExistDevs->at(i)->name);
+        if(-1 != idx)
+            m_lstDevs.removeAt(idx);
+    }
+    m_cntDevs = 0;
+    endResetModel();
+    QModelIndex topLeft = createIndex(0,0);
+    emit dataChanged(topLeft,topLeft);
+}
+
+bool SubrouteDevsCompleter::canFetchMore(const QModelIndex &parent) const{
+    if(!parent.isValid()) return false;
+    std::cout << __PRETTY_FUNCTION__  << parent.row() << std::endl;
+    return (m_cntDevs < m_lstDevs.length());
+}
+
+void SubrouteDevsCompleter::fetchMore(const QModelIndex &parent){
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    if(!parent.isValid()) return;
+
+    int remainder = m_lstDevs.length() - m_cntDevs;
+    int itemsToFetch = qMin(10, remainder);
+    if(itemsToFetch <= 0) return;
+
+    beginInsertRows(QModelIndex(), m_cntDevs, m_cntDevs + itemsToFetch - 1);
+    m_cntDevs += itemsToFetch;
+    endInsertRows();
+    emit numberPopulated(itemsToFetch);
 }

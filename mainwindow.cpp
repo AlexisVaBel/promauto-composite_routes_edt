@@ -16,7 +16,8 @@
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new RoutesUI(this))
 {    
 
-    m_provider   = std::make_shared<IBPPDataProvider> ("localhost","/work/cmn/db/trtovs/trtovs_mtr.fdb", "SYSDBA", "masterskey");
+//    m_provider   = std::make_shared<IBPPDataProvider> ("localhost","/work/cmn/db/trtovs/trtovs_mtr.fdb", "SYSDBA", "masterskey");
+    m_provider   = std::make_shared<IBPPDataProvider> ("localhost","/work/cmn/db/trtkr/trtkr_mtr.fdb", "SYSDBA", "masterskey");
     m_ui_all_rts = std::make_shared<RoutesAll>(ui, m_provider);
     m_ui_rt_conf = std::make_shared<RouteConf>(ui, m_provider);
     m_ui_subrt_conf = std::make_shared<SubRouteConf>(ui, m_provider);

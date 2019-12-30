@@ -2,6 +2,7 @@
 
 #include <QLabel>
 #include <QLineEdit>
+#include <QTextCodec>
 
 
 RoutesUI::RoutesUI(QMainWindow *MainWindow)
@@ -98,9 +99,11 @@ RoutesUI::RoutesUI(QMainWindow *MainWindow)
     MainWindow->setCentralWidget(m_centralwidget);
     MainWindow->setStatusBar(statusbar);
 
-    m_tabWidget->addTab(m_tabRtsAll,  QString("first"));
-    m_tabWidget->addTab(m_tabSubRtsConf, QString("second"));
-    m_tabWidget->addTab(m_tabRtsConf, QString("third"));
+    QTextCodec *codec = QTextCodec::codecForName("CP1251");
+
+    m_tabWidget->addTab(m_tabRtsAll,  codec->toUnicode("Маршруты"));
+    m_tabWidget->addTab(m_tabSubRtsConf, codec->toUnicode("Редактор групп"));
+    m_tabWidget->addTab(m_tabRtsConf, codec->toUnicode("Редактор Маршрутов"));
 
 
 }

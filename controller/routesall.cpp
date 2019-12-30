@@ -9,103 +9,18 @@
 #include <QTextCodec>
 #include <iostream>
 
-struct STRCT_ALL_ROUTES{
-    int id;
-    QString str_name;
-    QString str_descr;
-    int code;
-};
 
-struct STRCT_SUBS_IN_ROUTE{
-    int id;
-    int root_id;
-    QString str_name;
-};
-
-struct STRCT_DEVS_IN_ROUTE{
-    // not editable
-    int     id;
-    int     root_id;
-    int     device_id;
-    QString str_name;
-    //~not editable
-
-    // editable
-    int fl_transparent;     // FL_TRANSPARENT - Пр : 0 - , 1 - ПрЗ, 2 - ПрР , 3 - Пр
-        // bitwise
-    int fl_ctronly;
-    int fl_armo;
-    int fl_ctrlprod;
-    int fl_prod;
-    int fl_soleowner;
-        //~ bitwise
-    int dly_prodstop;
-    int order;
-
-    int time_start;
-    int time_stop;
-    // editable
-
-
-    bool equal(STRCT_DEVS_IN_ROUTE & that){
-        return (this->id == that.id) &&
-                (this->fl_transparent == that.fl_transparent ) &&
-                (this->fl_armo == that.fl_armo) &&
-                (this->fl_prod == that.fl_prod) &&
-                (this->fl_ctronly == that.fl_ctronly) &&
-                (this->fl_ctrlprod == that.fl_ctrlprod) &&
-                (this->fl_soleowner == that.fl_soleowner) &&
-                (this->dly_prodstop == that.dly_prodstop) &&
-                (this->time_start == that.time_start) &&
-                (this->time_stop == that.time_stop) &&
-                (this->order == that.order);
-    }
-
-    bool equal(STRCT_DEVS_IN_ROUTE * that){
-        return (this->id == that->id) &&
-                (this->fl_transparent == that->fl_transparent ) &&
-                (this->fl_armo == that->fl_armo) &&
-                (this->fl_prod == that->fl_prod) &&
-                (this->fl_ctronly == that->fl_ctronly) &&
-                (this->fl_ctrlprod == that->fl_ctrlprod) &&
-                (this->fl_soleowner == that->fl_soleowner) &&
-                (this->dly_prodstop == that->dly_prodstop) &&
-                (this->time_start == that->time_start) &&
-                (this->time_stop == that->time_stop) &&
-                (this->order == that->order);
-    }
-
-};
-
-// fl_armo - H
-// FL_CTRLPROD - Кп
-// FL_PROD - Пд
-// DLY_PRODSTOP - ПдЗ
-// FL_TRANSPARENT - Пр : 0 - , 1 - ПрЗ, 2 - ПрР , 3 - Пр
-// FL_SOLEOWNER - И
-// FL_CTRLONLY - К - Только контроль без управления
-// << ("ПдЗ")<<("Пр")<< ("И")<<("Старт")<< ("Стоп"))
-
-static const int FL_CTRONLY_COL      = 2;
-static const int FL_ARMO_COL         = 3;
-static const int FL_CTRLPROD_COL     = 4;
-static const int FL_PROD_COL         = 5;
-static const int FL_SOLEOWNER_COL    = 6;
-static const int FL_TRANSPARENT_COL  = 7;
-static const int FL_DLYPRODSTOP_COL  = 8;
-static const int FL_TIMESTART_COL    = 9;
-static const int FL_TIMESTOP_COL     = 10;
-
-//
 
 
 RoutesAll::RoutesAll(RoutesUI *ui, std::shared_ptr<IDataProvider> provider):UIToDBTable (ui, provider)
 {
     configure_UI();
     configure_SIGSLOTS();
-    m_lstAllRts     = std::make_shared<QList<STRCT_ALL_ROUTES*>>();
-    m_lstSubsInRt   = std::make_shared<QList<STRCT_SUBS_IN_ROUTE*>>();;
-    m_lstDevsInRt   = std::make_shared<QList<STRCT_DEVS_IN_ROUTE*>>();;
+    m_lstAllRts     = std::make_shared<QList<StructRoots*>>();
+    m_lstSubsInRt   = std::make_shared<QList<StructRoots*>>();
+    m_lstDevsInRt   = std::make_shared<QList<StructRoots*>>();
+
+    m_lstOfCheckBoxes = std::make_shared<QList<QCheckBox*>>();
 }
 
 void RoutesAll::routes_cellClicked(int irow, int icol)
@@ -147,8 +62,8 @@ void RoutesAll::update_devs()
 
     // Manual mode "DELETE FROM  SUBROOTS WHERE  ID = :OLD_ID"
 
-        STRCT_DEVS_IN_ROUTE *devs_in_route = new STRCT_DEVS_IN_ROUTE();
-        STRCT_DEVS_IN_ROUTE *devs_in_route_to_cmp = nullptr;
+        StructRoots *devs_in_route = new StructRoots();
+        StructRoots *devs_in_route_to_cmp = nullptr;
         devs_in_route->id = m_ui->tbl_RtsAll_AllDevs->item(i,0)->text().toInt();
 
         for(int j = 0; j < m_lstDevsInRt->length(); ++j){
@@ -206,7 +121,7 @@ void RoutesAll::add_route()
     if(strSomeText.isEmpty()) return;
 
     for(int i = 0; i < m_lstAllRts->length(); ++i){
-        if(m_lstAllRts->at(i)->str_name.compare(strSomeText, Qt::CaseInsensitive) == 0){
+        if(m_lstAllRts->at(i)->name.compare(strSomeText, Qt::CaseInsensitive) == 0){
             std::cerr << "already exists " << strSomeText.toStdString() << std::endl;
             return;
         }
@@ -249,11 +164,11 @@ void RoutesAll::update_route()
     int id = m_lstAllRts->at(lstSelected.at(0).row())->id;
 
     QTextCodec *codec = QTextCodec::codecForName("CP1251");
-    QString strSomeText = m_lstAllRts->at(lstSelected.at(0).row())->str_name;
+    QString strSomeText = m_lstAllRts->at(lstSelected.at(0).row())->name;
     strSomeText = get_user_input(strSomeText);
 
     if(strSomeText.isEmpty()) return;   // empty input
-    if(strSomeText.compare(m_lstAllRts->at(lstSelected.at(0).row())->str_name,Qt::CaseInsensitive) == 0) return; // nothing changed
+    if(strSomeText.compare(m_lstAllRts->at(lstSelected.at(0).row())->name,Qt::CaseInsensitive) == 0) return; // nothing changed
 
     QString strDML = UPDATE_ROUTE_ALL;
     strDML = strDML.arg(strSomeText).arg(id);
@@ -286,6 +201,7 @@ void RoutesAll::configure_UI()
     m_ui->tbl_RtsAll_AvlRts->setSelectionMode(QAbstractItemView::SingleSelection);
     m_ui->tbl_RtsAll_AvlRts->setSelectionBehavior(QAbstractItemView::SelectRows);
     m_ui->tbl_RtsAll_AvlRts->hideColumn(0);
+    m_ui->tbl_RtsAll_AvlRts->setColumnWidth(1, m_ui->tbl_RtsAll_AvlRts->width());
 
     m_ui->tbl_RtsAll_AvlRts->setHorizontalHeaderLabels(QStringList() << "Id" << codec->toUnicode("Маршруты"));
 
@@ -295,6 +211,8 @@ void RoutesAll::configure_UI()
     m_ui->tbl_RtsAll_SubsInRt->setSelectionMode(QAbstractItemView::SingleSelection);
     m_ui->tbl_RtsAll_SubsInRt->setSelectionBehavior(QAbstractItemView::SelectRows);
     m_ui->tbl_RtsAll_SubsInRt->setHorizontalHeaderLabels(QStringList() << codec->toUnicode("Группы маршрута"));
+    m_ui->tbl_RtsAll_SubsInRt->setColumnWidth(0, m_ui->tbl_RtsAll_SubsInRt->width());
+
 
     // available devices
     m_ui->tbl_RtsAll_AllDevs->setColumnCount(11);
@@ -305,6 +223,13 @@ void RoutesAll::configure_UI()
     m_ui->tbl_RtsAll_AllDevs->setHorizontalHeaderLabels(QStringList() << "Id" << codec->toUnicode("Устройства") << codec->toUnicode("К") << codec->toUnicode("Н")
                                                        << codec->toUnicode("Кп") << codec->toUnicode("Пд") << codec->toUnicode("И")
                                                        << codec->toUnicode("Пр") << codec->toUnicode("ПдЗ")<< codec->toUnicode("Старт")<<codec->toUnicode("Стоп"));
+
+    for(int i = 2; i < 9 ; ++i){
+
+        if(i == 7)m_ui->tbl_RtsAll_AllDevs->setColumnWidth(i,50);
+        else
+            m_ui->tbl_RtsAll_AllDevs->setColumnWidth(i,40);
+    }
 
     m_ui->m_pnlBtnsRtsAll->btnAccept->setText(codec->toUnicode("Изменить"));
 
@@ -357,7 +282,7 @@ void RoutesAll::updateRoutesView()
         for(int i = 0; i < m_lstAllRts->length(); ++i){
             m_ui->tbl_RtsAll_AvlRts->insertRow(i);
             m_ui->tbl_RtsAll_AvlRts->setItem(i, 0, new QTableWidgetItem(m_lstAllRts->at(i)->id));
-            m_ui->tbl_RtsAll_AvlRts->setItem(i, 1, new QTableWidgetItem(m_lstAllRts->at(i)->str_name));
+            m_ui->tbl_RtsAll_AvlRts->setItem(i, 1, new QTableWidgetItem(m_lstAllRts->at(i)->name));
             m_ui->tbl_RtsAll_AvlRts->item(i,1)->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 
         }
@@ -377,7 +302,7 @@ void RoutesAll::updateSubsView()
 
         for(int i = 0; i < m_lstSubsInRt->length(); ++i){
             m_ui->tbl_RtsAll_SubsInRt->insertRow(i);
-            m_ui->tbl_RtsAll_SubsInRt->setItem(i, 0, new QTableWidgetItem(m_lstSubsInRt->at(i)->str_name));
+            m_ui->tbl_RtsAll_SubsInRt->setItem(i, 0, new QTableWidgetItem(m_lstSubsInRt->at(i)->name));
         }
     } catch (std::exception &exc) {
         std::cerr << exc.what() << std::endl;
@@ -399,7 +324,7 @@ void RoutesAll::updateDevsView()
             m_ui->tbl_RtsAll_AllDevs->insertRow(i);
 
             m_ui->tbl_RtsAll_AllDevs->setItem(i, 0, new QTableWidgetItem(QString::number(m_lstDevsInRt->at(i)->id)));
-            m_ui->tbl_RtsAll_AllDevs->setItem(i, 1, new QTableWidgetItem(m_lstDevsInRt->at(i)->str_name));
+            m_ui->tbl_RtsAll_AllDevs->setItem(i, 1, new QTableWidgetItem(m_lstDevsInRt->at(i)->name));
 
             for(int j = FL_CTRONLY_COL; j < FL_TRANSPARENT_COL ; ++j){
                 m_ui->tbl_RtsAll_AllDevs->setCellWidget(i, j, new QCheckBox());
@@ -455,13 +380,13 @@ void RoutesAll::selectSubs(int id)
     m_lstSubsInRt->clear();
     for(int i = 0; i < nodes->length(); ++i){
         auto tmp = nodes->at(i)->get_by_name("Id");
-        STRCT_SUBS_IN_ROUTE *rts = new STRCT_SUBS_IN_ROUTE();
+        StructRoots *rts = new StructRoots();
         if (tmp != nullptr){
             rts->id = tmp->m_varValue.toInt();
         }
         tmp = nodes->at(i)->get_by_name("Name");
         if (tmp != nullptr){
-            rts->str_name = tmp->m_varValue.toString();
+            rts->name = tmp->m_varValue.toString();
         }
         m_lstSubsInRt->push_back(std::move(rts));
     }
@@ -478,7 +403,7 @@ void RoutesAll::selectDevs(int id)
 
     m_lstDevsInRt->clear();
     for(int i = 0; i < nodes->length(); ++i){
-        STRCT_DEVS_IN_ROUTE *rts = new STRCT_DEVS_IN_ROUTE();
+        StructRoots *rts = new StructRoots();
         auto tmp = nodes->at(i)->get_by_name("id");
         rts->root_id = id;
 
@@ -487,7 +412,7 @@ void RoutesAll::selectDevs(int id)
         }
         tmp = nodes->at(i)->get_by_name("Name");
         if (tmp != nullptr){
-            rts->str_name = tmp->m_varValue.toString();
+            rts->name = tmp->m_varValue.toString();
         }
 
 
@@ -563,7 +488,7 @@ bool RoutesAll::procsSelect()
     //
     m_lstAllRts->clear();
     for(int i = 0; i < nodes->length(); ++i){        
-        STRCT_ALL_ROUTES *rts = new STRCT_ALL_ROUTES();
+        StructRoots *rts = new StructRoots();
 
         auto tmp = nodes->at(i)->get_by_name("Id");
         if (tmp != nullptr){
@@ -571,7 +496,7 @@ bool RoutesAll::procsSelect()
         }
         tmp = nodes->at(i)->get_by_name("Name");
         if (tmp != nullptr){
-            rts->str_name = tmp->m_varValue.toString();
+            rts->name = tmp->m_varValue.toString();
         }
         m_lstAllRts->push_back(std::move(rts));
     }

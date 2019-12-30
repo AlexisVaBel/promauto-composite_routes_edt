@@ -1,5 +1,5 @@
 QT       += core gui widgets
-CONFIG   +=c++14
+CONFIG   +=c++17
 TARGET   = CompRoutes
 TEMPLATE = app
 QMAKE_CXXFLAGS += -std=c++14

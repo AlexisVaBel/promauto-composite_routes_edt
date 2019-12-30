@@ -3,10 +3,10 @@
 
 #include "uitodbtable.h"
 
+#include <QCheckBox>
+#include "domain/roots.h"
 
-struct STRCT_ALL_ROUTES;
-struct STRCT_SUBS_IN_ROUTE;
-struct STRCT_DEVS_IN_ROUTE;
+
 
 
 class RoutesAll : public UIToDBTable
@@ -42,9 +42,9 @@ public:
 
 
 private:
-    std::shared_ptr<QList<STRCT_ALL_ROUTES*>>    m_lstAllRts;
-    std::shared_ptr<QList<STRCT_SUBS_IN_ROUTE*>> m_lstSubsInRt;
-    std::shared_ptr<QList<STRCT_DEVS_IN_ROUTE*>> m_lstDevsInRt;
+    std::shared_ptr<QList<StructRoots*>> m_lstAllRts;
+    std::shared_ptr<QList<StructRoots*>> m_lstSubsInRt;
+    std::shared_ptr<QList<StructRoots*>> m_lstDevsInRt;
 
     void updateRoutesView() ;
     void updateSubsView() ;
@@ -52,6 +52,11 @@ private:
 
     void selectSubs(int id);
     void selectDevs(int id);
+
+    std::shared_ptr<QList<QCheckBox*>>      m_lstOfCheckBoxes;
+    int                                     m_iUsedCheckBox;
+    int                                     m_iMaxCheckBox;
+
 
 };
 
