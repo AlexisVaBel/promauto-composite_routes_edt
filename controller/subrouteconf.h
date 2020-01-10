@@ -48,6 +48,12 @@ public slots:
 
 
     void    add_device();
+    void    del_device();
+
+    void    add_subroute();
+    void    del_subroute();
+    void    refr_subroute();
+    void    acc_subroute();
 
 public:
     virtual void configure_UI() override;

@@ -7,7 +7,7 @@
 class IBPPDataProvider : public IDataProvider
 {
 public:
-    virtual ~IBPPDataProvider();
+    virtual ~IBPPDataProvider() override;
 
     IBPPDataProvider(std::string &strHost, std::string &strPath, std::string &strUser, std::string &strPass);
 
@@ -17,9 +17,9 @@ public:
 
     bool proces_sql(const std::string &str, bool bDML = false, std::shared_ptr<QList<ColumnNode *>> m_lst = nullptr) override;
 
-    bool connect();
+    bool connect() override;
 
-    bool disconnect();
+    bool disconnect() override;
 
     IBPP::Database get_DB() const {return  m_db;}
 

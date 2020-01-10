@@ -52,6 +52,32 @@ void SubRouteConf::add_device()
 
 }
 
+void SubRouteConf::del_device()
+{
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
+}
+
+void SubRouteConf::add_subroute()
+{
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
+}
+
+void SubRouteConf::del_subroute()
+{
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
+}
+
+void SubRouteConf::refr_subroute()
+{
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
+}
+
+void SubRouteConf::acc_subroute()
+{
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
+}
+
+
 void SubRouteConf::configure_UI()
 {
     QTextCodec *codec = QTextCodec::codecForName("CP1251");
@@ -88,6 +114,11 @@ void SubRouteConf::configure_SIGSLOTS()
 
     connect(m_ui->tbl_SubRtsConf_SubsAll,    &QTableWidget::cellClicked, this, &SubRouteConf::subs_cellClicked );
     connect(m_ui->m_pnlBtns_SubRtsConf_DevsInSub->btnAdd,  &QPushButton::pressed     , this, &SubRouteConf::add_device);
+
+    connect(m_ui->m_pnlBtns_SubRtsConf->btnAdd,  &QPushButton::pressed     , this, &SubRouteConf::add_subroute);
+    connect(m_ui->m_pnlBtns_SubRtsConf->btnDell,  &QPushButton::pressed     , this, &SubRouteConf::del_subroute);
+    connect(m_ui->m_pnlBtns_SubRtsConf->btnRefr,  &QPushButton::pressed     , this, &SubRouteConf::refr_subroute);
+    connect(m_ui->m_pnlBtns_SubRtsConf->btnAccept,  &QPushButton::pressed     , this, &SubRouteConf::acc_subroute);
 }
 
 bool SubRouteConf::procsSelect()
