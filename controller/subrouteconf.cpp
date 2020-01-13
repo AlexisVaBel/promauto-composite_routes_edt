@@ -18,6 +18,8 @@ SubRouteConf::SubRouteConf(RoutesUI *ui, std::shared_ptr<IDataProvider> provider
     configure_UI();
     configure_SIGSLOTS();
     m_lstCompleter  = std::make_shared<QStringList>();
+    m_lstCompleted  = std::make_shared<QStringList>();
+
     m_lstAllSubs    = std::make_shared<QList<StructRoots *>>();
     m_lstDevsInSub  = std::make_shared<QList<StructRoots *>>();
     m_lstAllDevs    = std::make_shared<QList<StructRoots *>>();
@@ -39,16 +41,63 @@ void SubRouteConf::tab_idx_changed(int idx)
     }
 }
 
+
+void SubRouteConf::devs_cellClicked(int irow, int icol)
+{
+  std::cout << __PRETTY_FUNCTION__ << " | " << irow << " | " << icol << std::endl ;
+  if(icol != 1) return;
+}
+
+
+void SubRouteConf::dev_cellChanged(const QString &str)
+{
+    std::cout << __PRETTY_FUNCTION__ << str.toStdString() << std::endl ;
+    m_lstCompleted->append(str);
+}
+
+void SubRouteConf::dev_cellChanged(const QString &strOld, const QString &strNew)
+{
+    std::cout << __PRETTY_FUNCTION__ << strOld.toStdString() << " -- " << strNew.toStdString() << std::endl ;
+    m_lstCompleter->append(strOld);
+    m_lstCompleter->removeAll(strNew);
+
+    m_lstCompleted->append(strNew);
+    m_lstCompleted->removeAll(strOld);
+
+    //
+
+}
+
 void SubRouteConf::add_device()
 {    
     int irow = m_ui->tbl_SubRtsConf_DevsInSub->rowCount();
     m_ui->tbl_SubRtsConf_DevsInSub->insertRow(irow);
 
-    QComboBox *cmb = new QComboBox();
+
+
+    SubrouteDevCombo *cmb = new SubrouteDevCombo();
     cmb->setCompleter(m_completer);
+    connect(cmb, SIGNAL(textChangedSignal(const QString&, const QString&)), this, SLOT(dev_cellChanged(const QString&, const QString&)));
 
     cmb->addItems(*(m_lstCompleter.get()));
+    cmb->setMaxVisibleItems(10); // magic number ooohhhh
+
+
     m_ui->tbl_SubRtsConf_DevsInSub->setCellWidget(irow, 1, std::move(cmb));
+    //
+    m_ui->tbl_SubRtsConf_DevsInSub->setItem(irow, 2, new QTableWidgetItem(""));
+    m_ui->tbl_SubRtsConf_DevsInSub->setItem(irow, 3, new QTableWidgetItem(""));
+    m_ui->tbl_SubRtsConf_DevsInSub->setItem(irow, 4, new QTableWidgetItem(""));
+    m_ui->tbl_SubRtsConf_DevsInSub->setItem(irow, 5, new QTableWidgetItem(""));
+
+    m_ui->tbl_SubRtsConf_DevsInSub->setItem(irow, 6, new QTableWidgetItem(""));
+    m_ui->tbl_SubRtsConf_DevsInSub->setItem(irow, 7, new QTableWidgetItem(""));
+    m_ui->tbl_SubRtsConf_DevsInSub->setItem(irow, 8, new QTableWidgetItem(""));
+    m_ui->tbl_SubRtsConf_DevsInSub->setItem(irow, 9, new QTableWidgetItem(""));
+    m_ui->tbl_SubRtsConf_DevsInSub->setItem(irow, 10,new QTableWidgetItem(""));
+    //
+
+    ((QComboBox *) m_ui->tbl_SubRtsConf_DevsInSub->cellWidget(irow, 1))->showPopup();
 
 }
 
@@ -113,6 +162,9 @@ void SubRouteConf::configure_SIGSLOTS()
     connect(m_ui->m_tabWidget,    &QTabWidget::currentChanged, this, &SubRouteConf::tab_idx_changed);
 
     connect(m_ui->tbl_SubRtsConf_SubsAll,    &QTableWidget::cellClicked, this, &SubRouteConf::subs_cellClicked );
+    connect(m_ui->tbl_SubRtsConf_DevsInSub,    &QTableWidget::cellClicked, this, &SubRouteConf::devs_cellClicked );
+
+
     connect(m_ui->m_pnlBtns_SubRtsConf_DevsInSub->btnAdd,  &QPushButton::pressed     , this, &SubRouteConf::add_device);
 
     connect(m_ui->m_pnlBtns_SubRtsConf->btnAdd,  &QPushButton::pressed     , this, &SubRouteConf::add_subroute);
@@ -174,6 +226,7 @@ void SubRouteConf::sel_allDevs()
     QCompleter *cmp = m_completer;
     delete cmp;
     m_completer = new QCompleter(*(m_lstCompleter.get()));
+
 }
 
 void SubRouteConf::upd_subRts_view()
@@ -213,6 +266,18 @@ void SubRouteConf::upd_devsInSub_view()
             m_ui->tbl_SubRtsConf_DevsInSub->insertRow(i);
             m_ui->tbl_SubRtsConf_DevsInSub->setItem(i, 0, new QTableWidgetItem(m_lstDevsInSub->at(i)->id));
             m_ui->tbl_SubRtsConf_DevsInSub->setItem(i, 1, new QTableWidgetItem(m_lstDevsInSub->at(i)->name));
+            //
+            m_ui->tbl_SubRtsConf_DevsInSub->setItem(i, 2, new QTableWidgetItem(""));
+            m_ui->tbl_SubRtsConf_DevsInSub->setItem(i, 3, new QTableWidgetItem(""));
+            m_ui->tbl_SubRtsConf_DevsInSub->setItem(i, 4, new QTableWidgetItem(""));
+            m_ui->tbl_SubRtsConf_DevsInSub->setItem(i, 5, new QTableWidgetItem(""));
+
+            m_ui->tbl_SubRtsConf_DevsInSub->setItem(i, 6, new QTableWidgetItem(""));
+            m_ui->tbl_SubRtsConf_DevsInSub->setItem(i, 7, new QTableWidgetItem(""));
+            m_ui->tbl_SubRtsConf_DevsInSub->setItem(i, 8, new QTableWidgetItem(""));
+            m_ui->tbl_SubRtsConf_DevsInSub->setItem(i, 9, new QTableWidgetItem(""));
+            m_ui->tbl_SubRtsConf_DevsInSub->setItem(i, 10, new QTableWidgetItem(""));
+            //
         }
     } catch (std::exception &exc) {
         std::cerr << exc.what() << std::endl;
@@ -405,8 +470,7 @@ bool SubRouteConf::commonSelectProcedure(std::shared_ptr<QList<StructRoots *> > 
 
 
 
-SubrouteDevsCompleter::SubrouteDevsCompleter(QObject *parent): QAbstractListModel(parent), m_cntDevs(0){
-    m_lstDevs << "echo" << "bravo" << "popizd";
+SubrouteDevsCompleter::SubrouteDevsCompleter(QObject *parent): QAbstractListModel(parent), m_cntDevs(0){    
 }
 
 int SubrouteDevsCompleter::rowCount(const QModelIndex &parent) const
@@ -415,7 +479,7 @@ int SubrouteDevsCompleter::rowCount(const QModelIndex &parent) const
 }
 
 QVariant SubrouteDevsCompleter::data(const QModelIndex &index, int role) const{
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
+
     if(!index.isValid()) return QVariant();
     std::cout << __PRETTY_FUNCTION__ << std::endl;
 
@@ -438,13 +502,12 @@ void SubrouteDevsCompleter::setItemSrc(const std::shared_ptr<QList<StructRoots *
     std::cout << __PRETTY_FUNCTION__ << std::endl;
 
     beginResetModel();
-//    m_lstDevs.clear();
     m_cntDevs = 0;
     for(int i = 0; i < lstAllDevs->length(); ++i){
         m_lstDevs << (lstAllDevs->at(i)->name);
     }
     m_cntDevs = 0;
-    std::cout << m_lstDevs.length() << std::endl;
+
     endResetModel();
     QModelIndex topLeft = createIndex(0,0);
     emit dataChanged(topLeft,topLeft);

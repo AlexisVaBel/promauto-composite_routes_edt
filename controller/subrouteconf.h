@@ -5,6 +5,33 @@
 #include "domain/roots.h"
 
 
+#include <QComboBox>
+
+class SubrouteDevCombo: public QComboBox {
+    Q_OBJECT
+
+public:
+    SubrouteDevCombo(QWidget *parent = nullptr): QComboBox(parent), m_oldStr(){
+        //
+        connect(this, SIGNAL(editTextChanged(const QString&)),this, SLOT(textChangedSlot(const QString&)));
+        connect(this, SIGNAL(currentIndexChanged(const QString&)),this, SLOT(textChangedSlot(const QString&)));
+    }
+
+signals:
+    void textChangedSignal(const QString &oldStr, const QString &newStr);
+
+private slots:
+    void textChangedSlot( const QString &newStr){
+        emit textChangedSignal(m_oldStr, newStr);
+        m_oldStr = newStr;
+    }
+
+
+
+private:
+    QString m_oldStr;
+};
+
 
 class SubrouteDevsCompleter: public QAbstractListModel{
    Q_OBJECT
@@ -47,6 +74,11 @@ public slots:
     void    tab_idx_changed(int idx);
 
 
+    void    devs_cellClicked(int irow, int icol);
+    void    dev_cellChanged(const QString &str);
+    void    dev_cellChanged(const QString &strOld, const QString &strNew);
+
+
     void    add_device();
     void    del_device();
 
@@ -66,6 +98,9 @@ public:
 private:
     QCompleter                              *m_completer;
     std::shared_ptr<QStringList>            m_lstCompleter;
+    std::shared_ptr<QStringList>            m_lstCompleted;
+
+
     std::shared_ptr<QList<StructRoots*>>    m_lstAllSubs;
     std::shared_ptr<QList<StructRoots*>>    m_lstDevsInSub;
 
