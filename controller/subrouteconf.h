@@ -97,8 +97,11 @@ public:
 
 private:
     QCompleter                              *m_completer;
+
     std::shared_ptr<QStringList>            m_lstCompleter;
     std::shared_ptr<QStringList>            m_lstCompleted;
+
+
 
 
     std::shared_ptr<QList<StructRoots*>>    m_lstAllSubs;
@@ -107,8 +110,6 @@ private:
     std::shared_ptr<QList<StructRoots*>>    m_lstAllDevs;
 
 
-//    SubrouteDevsCompleter                   *m_modelDevs;
-//    std::shared_ptr<QStringList>              m_modelDevs;
 
 
     void sel_allSubs();
@@ -118,6 +119,10 @@ private:
 
     void upd_subRts_view();
     void upd_devsInSub_view();
+
+
+//    QString get_user_input(QString str);
+
 
 
     bool commonSelectProcedure(std::shared_ptr<QList<StructRoots *> > dataContainer, const QString &someScript, const uint &root_id = 0);

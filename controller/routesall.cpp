@@ -45,7 +45,8 @@ void RoutesAll::main_cellDblClicked(int irow, int icol)
 QString RoutesAll::get_user_input(QString str)
 {
     bool ok;
-    QString strUserInput = QInputDialog::getText(nullptr, tr("QInputDialog::getText()"), tr("Some input: "), QLineEdit::Normal, str, &ok);
+    QTextCodec *codec = QTextCodec::codecForName("CP1251");
+    QString strUserInput = QInputDialog::getText(nullptr, tr("QInputDialog::getText()"), codec->toUnicode("Название маршрута: "), QLineEdit::Normal, str, &ok);
 
     if(ok && !strUserInput.isEmpty()) return strUserInput;
 

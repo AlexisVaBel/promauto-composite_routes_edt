@@ -1,10 +1,12 @@
 #include "subrouteconf.h"
 
 #include "../domain/sqlholder.h"
+#include "../common/userinput.h"
 
 #include <QCheckBox>
 #include <QComboBox>
 #include <QCompleter>
+#include <QInputDialog>
 #include <QSpinBox>
 #include <QTextCodec>
 
@@ -108,7 +110,8 @@ void SubRouteConf::del_device()
 
 void SubRouteConf::add_subroute()
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    QString strSubName = get_user_input("Новый маршрут");
+    std::cout << __PRETTY_FUNCTION__  << " " << strSubName.toStdString()<< std::endl;
 }
 
 void SubRouteConf::del_subroute()
@@ -344,6 +347,20 @@ void SubRouteConf::upd_devsInSub_view()
     m_ui->tbl_SubRtsConf_DevsInSub->blockSignals(false);
     //***
 }
+
+//QString SubRouteConf::get_user_input(QString str)
+//{
+
+//    bool ok;
+//    QTextCodec *codec = QTextCodec::codecForName("CP1251");
+//    QString strUserInput = QInputDialog::getText(nullptr, tr("QInputDialog::getText()"), codec->toUnicode("Название маршрута: "), QLineEdit::Normal, str, &ok);
+
+
+//    if(ok && !strUserInput.isEmpty()) return strUserInput;
+
+//    return "";
+
+//}
 
 
 

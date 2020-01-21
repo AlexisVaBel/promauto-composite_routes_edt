@@ -33,6 +33,7 @@ win32{
 }
 
 HEADERS += \
+    common/userinput.h \
     controller/routeconf.h \
     controller/routesall.h \
     controller/subrouteconf.h \
